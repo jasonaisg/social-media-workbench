@@ -1,0 +1,94 @@
+# OS and editor state
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local agent / handoff material (contains machine-specific paths and state)
+AGENTS.md
+DEVELOPMENT.md
+INTEGRATION.md
+STORAGE_DESIGN.md
+handoff.md
+HANDOFF.md
+.local/
+
+# Local configuration and secrets
+/.env
+/.env.*
+/.dev.vars*
+/config.yaml
+/config.yml
+/master.json
+/.master-locator.json
+/.asset-sync.local.yaml
+/deploy.sh
+credentials*.json
+secrets*.json
+cookies*.json
+session.*
+*.p8
+*.p12
+*.pfx
+*.pem
+*.key
+*.keystore
+*.mobileprovision
+
+# Build-time development certificate pair (generated per clone).
+/pkg/certificate/certs/
+
+# Runtime data
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.log
+*.pid
+*.sock
+*.tmp
+*.bak
+/cache/
+/tmp/
+/workdir/
+/runtime/
+/downloads/
+/certs/
+/temp_sunnynet/
+/.asset-sync-store/
+/.migration.lock
+
+# Build and dependency output
+/dist/
+/vendor/
+node_modules/
+coverage/
+.gocache/
+*.exe
+*.exe~
+*.syso
+*.test
+*.out
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.wrangler/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
+# Locally generated scripts and assets
+/global.js
+/hooks.js
+/design/
+/fixtures/
+/scraper_examples/
+
+# Keep the source package named cache even though runtime cache directories are ignored.
+!pkg/cache/
+!pkg/cache/**

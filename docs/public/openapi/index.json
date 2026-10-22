@@ -1,0 +1,121 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "WeChat Channels Download API",
+    "version": "v260613",
+    "description": "可以通过 HTTP 请求来调用下载器的 API，现在提供了以下几类接口：\n\n- 视频号相关\n- 公众号相关\n- 下载器相关"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:2022",
+      "description": "本地服务器"
+    }
+  ],
+  "tags": [
+    {
+      "name": "视频号",
+      "description": "调用时保持视频号页面打开的状态，否则调用接口时会提示 `{\"code\":400,\"msg\":\"请先初始化客户端 socket 连接\"}`。当出现该提示时，打开视频号页面即可，如果已经打开，刷新一下。"
+    },
+    {
+      "name": "公众号",
+      "description": "部分接口需要保持任意文章页面打开的状态，否则调用接口时会提示 `{\"code\":400,\"msg\":\"请先初始化客户端 socket 连接\"}`。当出现该提示时，打开任意公众号文章页面即可，如果已经打开，刷新一下。"
+    },
+    {
+      "name": "下载任务",
+      "description": "下载任务 v1 接口：预览、创建、启停、重试、删除、清理、文件检查、查询和 WebSocket 状态推送"
+    },
+    {
+      "name": "媒体",
+      "description": "媒体文件预览与播放接口"
+    }
+  ],
+  "paths": {
+    "/api/channels/contact/search": {
+      "$ref": "./channels/contact_search.json"
+    },
+    "/api/channels/contact/feed/list": {
+      "$ref": "./channels/contact_feed_list.json"
+    },
+    "/api/channels/feed/profile": {
+      "$ref": "./channels/feed_profile.json"
+    },
+    "/api/channels/feed/share_url": {
+      "$ref": "./channels/feed_share_url.json"
+    },
+    "/api/channels/feed/comment/list": {
+      "$ref": "./channels/feed_comment_list.json"
+    },
+    "/api/channels/live/replay/list": {
+      "$ref": "./channels/live_replay_list.json"
+    },
+    "/api/channels/live/profile": {
+      "$ref": "./channels/live_profile.json"
+    },
+    "/api/channels/interactioned/list": {
+      "$ref": "./channels/interactioned_list.json"
+    },
+    "/api/channels/follow/list": {
+      "$ref": "./channels/follow_list.json"
+    },
+    "/api/channels/play/history": {
+      "$ref": "./channels/play_history.json"
+    },
+    "/rss/channels": {
+      "$ref": "./channels/rss.json"
+    },
+    "/play": {
+      "$ref": "./channels/play.json"
+    },
+    "/api/v1/download_task/prepare": {
+      "$ref": "./download_task/prepare.json"
+    },
+    "/api/v1/download_task/prepare_by_url": {
+      "$ref": "./download_task/prepare_by_url.json"
+    },
+    "/api/v1/download_task/create": {
+      "$ref": "./download_task/create.json"
+    },
+    "/api/v1/download_task/create_by_url": {
+      "$ref": "./download_task/create_by_url.json"
+    },
+    "/api/v1/download_task/start": {
+      "$ref": "./download_task/start.json"
+    },
+    "/api/v1/download_task/pause": {
+      "$ref": "./download_task/pause.json"
+    },
+    "/api/v1/download_task/resume": {
+      "$ref": "./download_task/resume.json"
+    },
+    "/api/v1/download_task/retry": {
+      "$ref": "./download_task/retry.json"
+    },
+    "/api/v1/download_task/delete": {
+      "$ref": "./download_task/delete.json"
+    },
+    "/api/v1/download_task/start_all": {
+      "$ref": "./download_task/start_all.json"
+    },
+    "/api/v1/download_task/pause_all": {
+      "$ref": "./download_task/pause_all.json"
+    },
+    "/api/v1/download_task/clear": {
+      "$ref": "./download_task/clear.json"
+    },
+    "/api/v1/download_task/clear_all": {
+      "$ref": "./download_task/clear_all.json"
+    },
+    "/api/v1/download_task/check_files": {
+      "$ref": "./download_task/check_files.json"
+    },
+    "/api/v1/download_task/list": {
+      "$ref": "./download_task/list.json"
+    },
+    "/api/v1/download_task/detail": {
+      "$ref": "./download_task/detail.json"
+    },
+    "/ws/v1/download_task": {
+      "$ref": "./download_task/ws.json"
+    }
+  }
+}

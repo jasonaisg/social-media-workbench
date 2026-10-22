@@ -1,0 +1,7 @@
+.channels-page { overflow: auto; height: 100%; padding: 24px; box-sizing: border-box; }
+.channels-downloads { margin-top: 24px; scroll-margin-top: 16px; }
+.channels-downloads-heading { padding: 0 0 12px; }
+.channels-downloads-title { margin: 0 0 8px; font-size: 18px; }
+.channels-downloads-description { margin: 0; color: var(--dm-color-text-secondary); font-size: 13px; }
+.channels-downloads .dl-page-root { height: 70vh; min-height: 460px; border: 1px solid var(--dm-color-border); border-radius: 10px; overflow: hidden; }
+@media(max-width:760px) { .channels-page { padding: 12px; } .channels-downloads .dl-page-root { height: 78vh; } }

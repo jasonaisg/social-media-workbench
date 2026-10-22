@@ -1,0 +1,256 @@
+import { defineConfig } from "vitepress";
+import { readdirSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+// 动态读取 releases 目录生成发布日志项
+function getReleaseItems() {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const releasesDir = join(__dirname, "../releases");
+  const files = readdirSync(releasesDir);
+
+  return files
+    .filter((file: string) => file.endsWith(".md"))
+    .map((file: string) => file.replace(".md", ""))
+    .sort((a: string, b: string) => b.localeCompare(a)) // 按日期倒序排列
+    .map((date: string) => ({
+      text: `v${date}`,
+      link: `/releases/${date}`,
+    }));
+}
+
+// 获取最新的 release 日期
+function getLatestRelease() {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const releasesDir = join(__dirname, "../releases");
+  const files = readdirSync(releasesDir);
+
+  const dates = files
+    .filter((file: string) => file.endsWith(".md"))
+    .map((file: string) => file.replace(".md", ""))
+    .sort((a: string, b: string) => b.localeCompare(a));
+
+  return dates[0] || "251201"; // 如果没有文件，返回默认值
+}
+
+// 构建时从 GitHub Release API 获取最新版本下载信息
+async function fetchReleaseData() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const res = await fetch(
+      "https://api.github.com/repos/ltaoo/wx_channels_download/releases/latest",
+      {
+        headers: { Accept: "application/vnd.github+json" },
+        signal: controller.signal,
+      },
+    );
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const release = await res.json();
+    return {
+      tag: release.tag_name,
+      url: release.html_url,
+      assets: (release.assets || []).map((a: any) => ({
+        name: a.name,
+        url: a.browser_download_url,
+        size: a.size,
+      })),
+    };
+  } catch {
+    clearTimeout(timeout);
+    return null;
+  }
+}
+
+export default defineConfig(async () => {
+  const latestReleaseDate = getLatestRelease();
+  const releaseItems = getReleaseItems();
+  // 使用模拟数据验证组件（取消注释以使用模拟数据）
+  const releaseData = await fetchReleaseData();
+  /* const releaseData = {
+    tag: "v260531",
+    url: "https://github.com/litaoo/wx_channels_download/releases/tag/v260531",
+    assets: [
+      { name: "wx_video_download_v260531_darwin_arm64.zip", url: "https://example.com/darwin_arm64.zip", size: 8_388_608 },
+      { name: "wx_video_download_v260531_darwin_x86_64.zip", url: "https://example.com/darwin_x86_64.zip", size: 8_500_000 },
+      { name: "wx_video_download_v260531_windows_x86_64.zip", url: "https://example.com/windows_x86_64.zip", size: 7_200_000 },
+      { name: "wx_video_download_safe_v260531_windows_x86_64.zip", url: "https://example.com/safe_windows_x86_64.zip", size: 14_000_000 },
+      { name: "wx_video_download_v260531_windows_arm64.zip", url: "https://example.com/windows_arm64.zip", size: 6_800_000 },
+      { name: "wx_video_download_v260531_linux_x86_64.tar.gz", url: "https://example.com/linux_x86_64.tar.gz", size: 12_000_000 },
+      { name: "wx_video_download_v260531_linux_arm64.tar.gz", url: "https://example.com/linux_arm64.tar.gz", size: 11_500_000 },
+    ],
+  }; */
+
+  return {
+    lang: "zh-CN",
+    title: "wx_channels_download",
+    description: "微信视频号下载工具文档",
+    base: "/wx_channels_download/",
+    lastUpdated: true,
+    head: [
+      [
+        "link",
+        { rel: "shortcut icon", href: "/wx_channels_download/favicon.png" },
+      ],
+      [
+        "link",
+        {
+          rel: "icon",
+          type: "image/png",
+          href: "/wx_channels_download/favicon.png",
+        },
+      ],
+    ],
+    themeConfig: {
+      nav: [
+        { text: "首页", link: "/" },
+        { text: "文档", link: "/guide/start" },
+        { text: "Releases", link: `/releases/${latestReleaseDate}` },
+        { text: "API Playground", link: "/feature/playground" },
+        { text: "FAQ", link: "/faq/button_inject_failed" },
+      ],
+      sidebar: [
+        {
+          text: "开始使用",
+          items: [
+            { text: "下载并运行", link: "/guide/start" },
+            { text: "使用步骤", link: "/guide/step" },
+            { text: "使用 Docker 运行", link: "/guide/docker" },
+            { text: "手动安装根证书", link: "/guide/certificate" },
+          ],
+        },
+        {
+          text: "功能",
+          items: [
+            { text: "API", link: "/feature/api" },
+            { text: "指定文件名", link: "/feature/filename" },
+            {
+              text: "视频号",
+              items: [
+                { text: "下载mp3", link: "/feature/wxchannels/mp3" },
+                { text: "下载直播", link: "/feature/wxchannels/live" },
+                {
+                  text: "下载作者所有视频",
+                  link: "/feature/wxchannels/batch",
+                },
+                {
+                  text: "自定义下载菜单",
+                  link: "/feature/wxchannels/custom-menu",
+                },
+                { text: "监听事件", link: "/feature/wxchannels/event" },
+              ],
+            },
+            {
+              text: "公众号",
+              items: [{ text: "下载公众号文章", link: "/feature/wxmp/guide" }],
+            },
+            {
+              text: "MCP",
+              link: "/feature/mcp",
+              items: [
+                { text: "启用", link: "/feature/mcp/enable" },
+                {
+                  text: "下载视频",
+                  link: "/feature/mcp/scenarios/fetch-and-download",
+                },
+                {
+                  text: "下载视频评论",
+                  link: "/feature/mcp/scenarios/comment-download",
+                },
+                {
+                  text: "修改下载目录",
+                  link: "/feature/mcp/scenarios/change-download-directory",
+                },
+                {
+                  text: "查询账号内容和浏览记录",
+                  link: "/feature/mcp/scenarios/query-account-content",
+                },
+                {
+                  text: "使用第三方下载器保存视频号视频",
+                  link: "/feature/mcp/scenarios/external-downloader",
+                },
+                { text: "命令", link: "/feature/mcp/commands" },
+              ],
+            },
+          ],
+        },
+        {
+          text: "配置",
+          items: [
+            { text: "工作目录", link: "/config/workdir" },
+            { text: "代理", link: "/config/proxy" },
+            { text: "根证书", link: "/config/cert" },
+            { text: "API 服务", link: "/config/api" },
+            { text: "下载", link: "/config/download" },
+            { text: "脚本", link: "/config/script" },
+            {
+              text: "视频号",
+              items: [
+                { text: "概览", link: "/config/channels/" },
+                { text: "启用视频号功能", link: "/config/channels/enabled" },
+                {
+                  text: "从详情页重定向到首页",
+                  link: "/config/channels/disable-location-to-home",
+                },
+                {
+                  text: "默认下载原始视频",
+                  link: "/config/channels/default-highest",
+                },
+                { text: "前端下载", link: "/config/channels/frontend" },
+                { text: "同时下载封面", link: "/config/channels/cover" },
+                {
+                  text: "下载时暂停播放",
+                  link: "/config/channels/pause-when-download",
+                },
+                {
+                  text: "批量下载时检查所有视频",
+                  link: "/config/channels/force-check-all-feeds",
+                },
+              ],
+            },
+            { text: "Cloudflare", link: "/config/cloudflare" },
+            { text: "调试", link: "/config/debug" },
+          ],
+        },
+        {
+          text: "命令行",
+          items: [
+            { text: "代理服务", link: "/cli/proxy" },
+            { text: "部署独立服务", link: "/cli/deploy" },
+            { text: "删除证书", link: "/cli/uninstall" },
+            { text: "查看版本", link: "/cli/version" },
+            { text: "更新", link: "/cli/update" },
+          ],
+        },
+        {
+          text: "常见问题",
+          items: [
+            { text: "没有下载按钮", link: "/faq/button_inject_failed" },
+            { text: "网络无法访问", link: "/faq/network_failed" },
+            { text: "PowerShell", link: "/faq/powershell" },
+          ],
+        },
+        {
+          text: "发布日志",
+          items: releaseItems,
+        },
+      ],
+      socialLinks: [
+        {
+          icon: "github",
+          link: "https://github.com/ltaoo/wx_channels_download",
+        },
+      ],
+      outline: "deep",
+      search: {
+        provider: "local",
+      },
+    },
+    vite: {
+      define: {
+        __RELEASE_DATA__: JSON.stringify(releaseData),
+      },
+    },
+  };
+});
